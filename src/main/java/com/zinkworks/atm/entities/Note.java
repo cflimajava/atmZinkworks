@@ -25,8 +25,16 @@ public class Note implements Serializable{
 	
 	@Column(nullable = false)
 	private Integer amount;
+	
+	public Note() {}
 
 	public Note(Integer value, Integer amount) {
+		this.value = value;
+		this.amount = amount;
+	}
+	
+	public Note(Integer id, Integer value, Integer amount) {
+		this.id = id;
 		this.value = value;
 		this.amount = amount;
 	}

@@ -7,7 +7,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.zinkworks.atm.interfaces.IAtmService;
+import com.zinkworks.atm.interfaces.services.IAtmService;
 
 @Aspect
 @Component

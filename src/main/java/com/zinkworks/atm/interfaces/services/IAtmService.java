@@ -1,7 +1,8 @@
-package com.zinkworks.atm.interfaces;
+package com.zinkworks.atm.interfaces.services;
 
-import com.zinkworks.atm.dtos.CashReceipt;
 import com.zinkworks.atm.exceptions.AtmAccountNoFundsEnoughException;
+import com.zinkworks.atm.representations.BalanceReceipt;
+import com.zinkworks.atm.representations.CashReceipt;
 
 public interface IAtmService {
 	
@@ -16,7 +17,7 @@ public interface IAtmService {
 	 */
 	public CashReceipt requestWithdrawal(String accountNumber, Integer amount);
 	
-	public void requestBalance(String accountNumber);
+	public BalanceReceipt requestBalance(String accountNumber);
 	
 	public void validatePin(String accountNumber, Integer pin);
 

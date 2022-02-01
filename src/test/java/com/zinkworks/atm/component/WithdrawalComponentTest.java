@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,11 +14,12 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
 import com.zinkworks.atm.dao.AccountDAO;
@@ -31,6 +33,7 @@ import com.zinkworks.atm.exceptions.AtmNotNotesEnoughException;
 import com.zinkworks.atm.exceptions.AtmWithdrawalNotPerformedException;
 import com.zinkworks.atm.impl.component.WithdrawalComponentImpl;
 
+@ExtendWith(MockitoExtension.class)
 public class WithdrawalComponentTest {
 	
 	@Mock
@@ -48,13 +51,12 @@ public class WithdrawalComponentTest {
 	private List<Note> listNotesAvailable;
 	private List<Note> listNotesUpdated;
 	
-	@Before
-	public void createMocks() {
-		MockitoAnnotations.openMocks(this);
-		initAccounts();
+	@BeforeEach
+	public void init() {
+		initMockData();
 	}
 	
-	private void initAccounts() {
+	private void initMockData() {
 		accountWith1000 = new Account();
 		accountWith1000.setBalance(new BigDecimal(800));
 		accountWith1000.setOverdraft(new BigDecimal(200));
@@ -63,8 +65,8 @@ public class WithdrawalComponentTest {
 		accountAfterUpdate.setBalance(new BigDecimal(100));
 		accountAfterUpdate.setOverdraft(new BigDecimal(200));
 		
-		listNotesAvailable = Arrays.asList(	new Note(50, 10),
-				new Note(20, 30), new Note(10, 30),	new Note(5, 20)	);
+		listNotesAvailable = Arrays.asList(	new Note(1,50, 10),
+				new Note(2,20, 30), new Note(3,10, 30),	new Note(4,5, 20)	);
 		
 		listNotesUpdated = Arrays.asList(	new Note(50, 0),
 				new Note(20, 20), new Note(10, 30),	new Note(5, 20)	);
@@ -73,7 +75,7 @@ public class WithdrawalComponentTest {
 	@Test
 	public void test_checkAccountHasFundsEnough_with_enough_balance() {
 		
-		when(accountDAO.getAccountByAccountNumber(accountNumber)).thenReturn(accountWith1000);
+		when(accountDAO.getAccountByAccountNumber(anyString())).thenReturn(accountWith1000);
 		
 		assertDoesNotThrow (
 				()-> component.checkAccountHasFundsEnough(accountNumber, 500));
@@ -98,6 +100,7 @@ public class WithdrawalComponentTest {
 	@Test
 	public void test_checkATMHasNotesEnough_success() {	
 		when(noteDAO.getAllNotesAvailable()).thenReturn(listNotesAvailable);
+		when(noteDAO.getTotalAmountAvailable()).thenReturn(1500);
 		
 		assertDoesNotThrow (
 				()->component.checkATMHasNotesEnough(1000));		
@@ -206,7 +209,7 @@ public class WithdrawalComponentTest {
 				() -> component.executeWithdrawal(listNotesAvailable, accountNumber, 700));
 		
 		assertEquals(exception.getStatus(), HttpStatus.EXPECTATION_FAILED.value());
-		verify(noteDAO, times(2)).updateNotes(anyList());
+		verify(noteDAO, times(1)).updateNotes(anyList());
 	}
 	
 	

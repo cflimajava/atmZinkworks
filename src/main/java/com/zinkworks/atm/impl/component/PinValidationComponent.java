@@ -5,7 +5,8 @@ import org.springframework.stereotype.Component;
 
 import com.zinkworks.atm.dao.AccountDAO;
 import com.zinkworks.atm.entities.Account;
-import com.zinkworks.atm.interfaces.IPinValidationComponent;
+import com.zinkworks.atm.exceptions.InvalidPinException;
+import com.zinkworks.atm.interfaces.components.IPinValidationComponent;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,7 +27,7 @@ public class PinValidationComponent implements IPinValidationComponent{
 		Account account = accountDAO.getAccountByAccountNumber(accountNumber);
 		
 		if(!account.getPin().equals(pin))
-			throw new RuntimeException("Invalid PIN for accountNumber: "+accountNumber);
+			throw new InvalidPinException("Invalid PIN for accountNumber: "+accountNumber);
 		
 		log.info("PIN validated successfully");		
 	}

@@ -5,12 +5,14 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.zinkworks.atm.dtos.CashReceipt;
 import com.zinkworks.atm.dtos.WithdrawalDTO;
 import com.zinkworks.atm.entities.Note;
-import com.zinkworks.atm.interfaces.IAtmService;
-import com.zinkworks.atm.interfaces.IPinValidationComponent;
-import com.zinkworks.atm.interfaces.IWithdrawalComponent;
+import com.zinkworks.atm.interfaces.components.IBalanceComponent;
+import com.zinkworks.atm.interfaces.components.IPinValidationComponent;
+import com.zinkworks.atm.interfaces.components.IWithdrawalComponent;
+import com.zinkworks.atm.interfaces.services.IAtmService;
+import com.zinkworks.atm.representations.BalanceReceipt;
+import com.zinkworks.atm.representations.CashReceipt;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,11 +22,14 @@ public class ATMServiceImpl implements IAtmService{
 	
 	private final IWithdrawalComponent withdrawalComponent;
 	private final IPinValidationComponent pinComponent;
+	private final IBalanceComponent balanceComponent;
 	
 	@Autowired
-	public ATMServiceImpl(IWithdrawalComponent withdrawalComponent, IPinValidationComponent pinComponent) {
+	public ATMServiceImpl(IWithdrawalComponent withdrawalComponent, IPinValidationComponent pinComponent,
+			IBalanceComponent balanceComponent) {
 		this.withdrawalComponent = withdrawalComponent;
 		this.pinComponent = pinComponent;
+		this.balanceComponent = balanceComponent;
 	}
 
 	@Override
@@ -37,18 +42,17 @@ public class ATMServiceImpl implements IAtmService{
 		
 		withdrawalComponent.checkNotesToPerformWithdrawal(notesAvailable, amountRequested);				
 				
-		List<WithdrawalDTO> moneyToBeDelivered = withdrawalComponent.selectNumberMinimumOfNotes(notesAvailable, amountRequested);		
+		List<WithdrawalDTO> moneyToDelivered = withdrawalComponent.selectNumberMinimumOfNotes(notesAvailable, amountRequested);		
 		
 		withdrawalComponent.executeWithdrawal(notesAvailable, accountNumber, amountRequested);		
 		
-		return new CashReceipt(moneyToBeDelivered, withdrawalComponent.getRemainingBalace(accountNumber));
+		return new CashReceipt(moneyToDelivered, withdrawalComponent.getRemainingBalace(accountNumber));
 		
 	}
 
 	@Override
-	public void requestBalance(String accountNumber) {
-		// TODO Auto-generated method stub
-		
+	public BalanceReceipt requestBalance(String accountNumber) {
+		return balanceComponent.getBalance(accountNumber);		
 	}
 
 	@Override

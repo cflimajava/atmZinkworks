@@ -1,4 +1,4 @@
-package com.zinkworks.atm.interfaces;
+package com.zinkworks.atm.interfaces.components;
 
 public interface IPinValidationComponent {
 	

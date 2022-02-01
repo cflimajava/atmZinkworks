@@ -18,6 +18,11 @@ public class NoteDAO {
 		return repo.findByAmountGreaterThanOrderByValueDesc(0);
 	}
 	
+	public Integer getTotalAmountAvailable() {
+		List<Note> notesAvailable = repo.findByAmountGreaterThanOrderByValueDesc(0);
+		return notesAvailable.stream().mapToInt(note -> note.getValue() * note.getAmount()).sum();
+	}
+	
 	public List<Note> updateNotes(List<Note> listUpdated) {
 		return repo.saveAll(listUpdated);
 	}

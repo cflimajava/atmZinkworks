@@ -17,7 +17,7 @@ import com.zinkworks.atm.exceptions.AtmAccountNoFundsEnoughException;
 import com.zinkworks.atm.exceptions.AtmAmountRequestedValueNonMultipleException;
 import com.zinkworks.atm.exceptions.AtmNotNotesEnoughException;
 import com.zinkworks.atm.exceptions.AtmWithdrawalNotPerformedException;
-import com.zinkworks.atm.interfaces.IWithdrawalComponent;
+import com.zinkworks.atm.interfaces.components.IWithdrawalComponent;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,8 +68,8 @@ public class WithdrawalComponentImpl implements IWithdrawalComponent{
 
 		List<Note> notesAvailable = noteDAO.getAllNotesAvailable();
 		
-		Integer totalAmmountAvailable = notesAvailable.stream().mapToInt(note -> note.getValue() * note.getAmount())
-				.sum();
+		Integer totalAmmountAvailable = noteDAO.getTotalAmountAvailable();
+		
 		if (totalAmmountAvailable < amountRequested)
 			throw new AtmNotNotesEnoughException("Amount Requested not availble");
 		
