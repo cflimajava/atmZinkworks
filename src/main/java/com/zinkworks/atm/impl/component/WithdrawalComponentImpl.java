@@ -149,13 +149,7 @@ public class WithdrawalComponentImpl implements IWithdrawalComponent{
 			// Update notes available
 			noteDAO.updateNotes(notesAvailable);
 			log.info("Notes available succesly updated");
-		}catch (Exception e) {
-			log.error(e.getMessage());
-			throw new AtmWithdrawalNotPerformedException("WITHDRAWAL REQUEST CANCELED - Was not possible update notes availables: " + notesAvailable.toString());			
-		}
 		
-
-		try {
 			BigDecimal subtracted = account.getBalance().subtract(new BigDecimal(amountRequested));
 			account.setBalance(subtracted);
 			accountDAO.updateAccount(account);	
@@ -163,7 +157,7 @@ public class WithdrawalComponentImpl implements IWithdrawalComponent{
 			log.error(e.getMessage());			
 			noteDAO.updateNotes(backUpNotes);
 			log.info("Notes available BACKUP RESTORED");
-			throw new AtmWithdrawalNotPerformedException("WITHDRAWAL REQUEST CANCELED - Was not possible update Account balance: " + notesAvailable.toString());	
+			throw new AtmWithdrawalNotPerformedException("WITHDRAWAL REQUEST CANCELED - Was not possible persist withdrawal changes");	
 		}
 		
 	}

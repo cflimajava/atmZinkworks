@@ -66,10 +66,10 @@ public class WithdrawalComponentTest {
 		accountAfterUpdate.setOverdraft(new BigDecimal(200));
 		
 		listNotesAvailable = Arrays.asList(	new Note(1,50, 10),
-				new Note(2,20, 30), new Note(3,10, 30),	new Note(4,5, 20)	);
+				new Note(2,20, 30), new Note(3,10, 30),	new Note(4,5, 20));
 		
-		listNotesUpdated = Arrays.asList(	new Note(50, 0),
-				new Note(20, 20), new Note(10, 30),	new Note(5, 20)	);
+		listNotesUpdated = Arrays.asList(	new Note(1, 50, 0),
+				new Note(2,20, 20), new Note(3,10, 30),	new Note(4,5, 20));
 	}
 
 	@Test
@@ -186,30 +186,34 @@ public class WithdrawalComponentTest {
 	@Test
 	public void test_executeWithdrawal_fail_to_update_notes() {
 		
-		when(noteDAO.getAllNotesAvailable())
-			.thenThrow(new AtmWithdrawalNotPerformedException("WITHDRAWAL REQUEST CANCELED - Was not possible update notes availables"));
+		when(accountDAO.getAccountByAccountNumber(accountNumber)).thenReturn(accountWith1000);
+		when(noteDAO.getAllNotesAvailable()).thenReturn(listNotesAvailable);
+		when(noteDAO.updateNotes(listNotesUpdated))
+			.thenThrow(new RuntimeException("Any exceptions"));
 		
 		AtmWithdrawalNotPerformedException exception = assertThrows(AtmWithdrawalNotPerformedException.class ,
-				() -> component.executeWithdrawal(listNotesAvailable, accountNumber, 700));
+				() -> component.executeWithdrawal(listNotesUpdated, accountNumber, 700));
 		
 		assertEquals(exception.getStatus(), HttpStatus.EXPECTATION_FAILED.value());
-		
+		assertEquals(exception.getMessage(), "WITHDRAWAL REQUEST CANCELED - Was not possible persist withdrawal changes");
+		verify(noteDAO, times(2)).updateNotes(anyList());
 	}
 	
 	@Test
 	public void test_executeWithdrawal_fail_to_update_balance() {
 		
-		
+		when(accountDAO.getAccountByAccountNumber(accountNumber)).thenReturn(accountWith1000);
 		when(noteDAO.getAllNotesAvailable()).thenReturn(listNotesAvailable);
 		when(noteDAO.updateNotes(listNotesUpdated)).thenReturn(listNotesUpdated);
 		when(accountDAO.updateAccount(any(Account.class)))
-			.thenThrow(new AtmWithdrawalNotPerformedException("WITHDRAWAL REQUEST CANCELED - Was not possible update Account balance"));
+			.thenThrow(new RuntimeException("Any exceptions"));
 		
-		AtmWithdrawalNotPerformedException exception = assertThrows(AtmWithdrawalNotPerformedException.class ,
-				() -> component.executeWithdrawal(listNotesAvailable, accountNumber, 700));
+		AtmWithdrawalNotPerformedException exception = assertThrows(AtmWithdrawalNotPerformedException.class,
+				() -> component.executeWithdrawal(listNotesUpdated, accountNumber, 700));
 		
 		assertEquals(exception.getStatus(), HttpStatus.EXPECTATION_FAILED.value());
-		verify(noteDAO, times(1)).updateNotes(anyList());
+		assertEquals(exception.getMessage(), "WITHDRAWAL REQUEST CANCELED - Was not possible persist withdrawal changes");
+		verify(noteDAO, times(1)).updateNotes(listNotesAvailable);
 	}
 	
 	
