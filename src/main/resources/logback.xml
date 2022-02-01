@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<property name="LOGS_DIR" value="/home/logsATM/" />
+
+	<appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder
+			class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
+		</encoder>
+  </appender>
+
+
+	<appender name="FILE-ROLLING"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOGS_DIR}/atm-zinkworks.log"</file>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_DIR}/archived/atm-zinkworks-%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<maxFileSize>20MB</maxFileSize>
+			<totalSizeCap>1GB</totalSizeCap>
+			<maxHistory>60</maxHistory>
+		</rollingPolicy>
+		<encoder
+			class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
+		</encoder>
+	</appender>
+
+	<!-- LOG "com.baeldung*" at TRACE level -->
+	<logger name="com.zinkworks.atm" level="debug"
+		additivity="false">
+		<appender-ref ref="FILE-ROLLING" />
+	</logger>
+
+	<!-- LOG everything at INFO level -->
+	<root level="info">
+		<appender-ref ref="Console" />
+		<appender-ref ref="FILE-ROLLING" />
+	</root>
+
+
+
+</configuration>
