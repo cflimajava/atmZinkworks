@@ -3,9 +3,11 @@
 Link initial
 http://localhost:8080/atm/swagger-ui.html
 
-End-points
-http://lhttp://localhost:8080/atm/withdrawal/{amount}
-http://lhttp://localhost:8080/atm/balance
+End-points 
+
+http://http://localhost:8080/atm/withdrawal/{amount}
+
+http://http://localhost:8080/atm/balance
 
 HEADERS PARAMETERS 
   
